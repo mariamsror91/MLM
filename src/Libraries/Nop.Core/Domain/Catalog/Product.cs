@@ -540,7 +540,18 @@ public partial class Product : BaseEntity, ILocalizedEntity, ISlugSupported, IAc
     /// </summary>
     public DateTime UpdatedOnUtc { get; set; }
 
+    /// <summary>
+    /// Gets or sets the county
+    /// </summary>
+    public string County { get; set; }
 
+    /// <summary>
+    /// Gets or sets the city
+    /// </summary>
+    public string City { get; set; }
+
+
+    public string Coordinates { get; set; }
 
     /// <summary>
     /// Gets or sets the product type

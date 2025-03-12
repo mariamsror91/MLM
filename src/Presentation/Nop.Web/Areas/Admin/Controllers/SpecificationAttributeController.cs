@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LinqToDB.Common;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
@@ -24,6 +26,9 @@ public partial class SpecificationAttributeController : BaseAdminController
     protected readonly IPermissionService _permissionService;
     protected readonly ISpecificationAttributeModelFactory _specificationAttributeModelFactory;
     protected readonly ISpecificationAttributeService _specificationAttributeService;
+    protected readonly IPictureService _pictureService;
+
+    
 
     #endregion Fields
 
@@ -35,7 +40,8 @@ public partial class SpecificationAttributeController : BaseAdminController
         INotificationService notificationService,
         IPermissionService permissionService,
         ISpecificationAttributeModelFactory specificationAttributeModelFactory,
-        ISpecificationAttributeService specificationAttributeService)
+        ISpecificationAttributeService specificationAttributeService,
+        IPictureService pictureService)
     {
         _customerActivityService = customerActivityService;
         _localizationService = localizationService;
@@ -44,6 +50,7 @@ public partial class SpecificationAttributeController : BaseAdminController
         _permissionService = permissionService;
         _specificationAttributeModelFactory = specificationAttributeModelFactory;
         _specificationAttributeService = specificationAttributeService;
+        _pictureService = pictureService;
     }
 
     #endregion
@@ -423,6 +430,11 @@ public partial class SpecificationAttributeController : BaseAdminController
         if (ModelState.IsValid)
         {
             var sao = model.ToEntity<SpecificationAttributeOption>();
+            var picture = await _pictureService.GetPictureByIdAsync(model.IconId);
+            if (picture != null)
+            {
+                sao.Icon = await _pictureService.GetPictureUrlAsync(picture.Id);
+            }
 
             //clear "Color" values if it's disabled
             if (!model.EnableColorSquaresRgb)
@@ -491,6 +503,13 @@ public partial class SpecificationAttributeController : BaseAdminController
             //clear "Color" values if it's disabled
             if (!model.EnableColorSquaresRgb)
                 specificationAttributeOption.ColorSquaresRgb = null;
+
+            var picture = await _pictureService.GetPictureByIdAsync(model.IconId);
+            if (picture != null)
+            {
+                specificationAttributeOption.Icon = await _pictureService.GetPictureUrlAsync(picture.Id);
+
+            }
 
             await _specificationAttributeService.UpdateSpecificationAttributeOptionAsync(specificationAttributeOption);
 

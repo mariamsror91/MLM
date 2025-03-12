@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
@@ -38,6 +39,10 @@ public partial record SpecificationAttributeOptionModel : BaseNopEntityModel, IL
 
     public IList<SpecificationAttributeOptionLocalizedModel> Locales { get; set; }
 
+    [UIHint("Picture")]
+    [NopResourceDisplayName("Admin.Catalog.Attributes.SpecificationAttributes.Options.Fields.Icon")]
+    public int IconId { get; set; }
+    public string IconUrl { get; set; }
     #endregion
 }
 

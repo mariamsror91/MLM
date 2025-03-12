@@ -26,4 +26,7 @@ public partial class SpecificationAttributeOption : BaseEntity, ILocalizedEntity
     /// Gets or sets the display order
     /// </summary>
     public int DisplayOrder { get; set; }
+
+    public string Icon { get; set; } 
+
 }

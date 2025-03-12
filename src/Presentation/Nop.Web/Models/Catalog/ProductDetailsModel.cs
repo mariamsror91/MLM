@@ -6,6 +6,7 @@ using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Nop.Web.Models.Vendors;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -21,7 +22,7 @@ public partial record ProductDetailsModel : BaseNopEntityModel
         AddToCart = new AddToCartModel();
         ProductAttributes = new List<ProductAttributeModel>();
         AssociatedProducts = new List<ProductDetailsModel>();
-        VendorModel = new VendorBriefInfoModel();
+        VendorModel = new VendorInfoModel();
         Breadcrumb = new ProductBreadcrumbModel();
         ProductTags = new List<ProductTagModel>();
         ProductSpecificationModel = new ProductSpecificationModel();
@@ -63,7 +64,7 @@ public partial record ProductDetailsModel : BaseNopEntityModel
     public string Gtin { get; set; }
 
     public bool ShowVendor { get; set; }
-    public VendorBriefInfoModel VendorModel { get; set; }
+    public VendorInfoModel VendorModel { get; set; }
 
     public bool HasSampleDownload { get; set; }
 
@@ -128,6 +129,12 @@ public partial record ProductDetailsModel : BaseNopEntityModel
 
     public string SelectedShippingMethod { get; set; } // For customer selection
     public IList<SelectListItem> AvailableShippingMethods { get; set; } // List of methods
+
+    public string County { get; set; }
+    public string City { get; set; }
+
+
+    public string Coordinates { get; set; }
 
     #region Nested Classes
 

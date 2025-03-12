@@ -28,6 +28,13 @@ public partial record ProductOverviewModel : BaseNopEntityModel
 
     public bool MarkAsNew { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
+    public string City { get; set; }
+
+    public string Country { get; set; }
+
+
     //price
     public ProductPriceModel ProductPrice { get; set; }
     //pictures

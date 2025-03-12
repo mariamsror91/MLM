@@ -42,6 +42,7 @@ public partial class ProductSpecificationAttribute : BaseEntity, ILocalizedEntit
     /// </summary>
     public int DisplayOrder { get; set; }
 
+
     /// <summary>
     /// Gets the attribute control type
     /// </summary>

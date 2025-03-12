@@ -2772,7 +2772,7 @@ box-shadow:none;
   }
 
   .item-box .city {
-      gap:50px !important;
+      gap:107px !important;
   }
 
   .city img {
@@ -2919,6 +2919,7 @@ box-shadow:none;
   color: #383375 !important;
   background-color: white !important;
   border: 2px solid #383375 !important;
+  display:block !important;
 }
 
 .contact-btns {
@@ -3099,7 +3100,7 @@ box-shadow:none;
 }
 
   .amenities img {
-      margin-top: -5px;
+      margin-top: -10px;
   }
 
   .show-more-amenities {
@@ -3341,8 +3342,8 @@ box-shadow:none;
   text-transform: capitalize;
   font-weight: 600;
   display: inline-block;
-  min-width: 27px;
-}
+/*  min-width: 27px;
+*/}
 
 .star-icons {
   height: 17px;
@@ -3563,7 +3564,7 @@ box-shadow:none;
   text-transform: capitalize;
   font-weight: 600;
   display: inline-block;
-  min-width: 27px;
+  /*min-width: 27px;*/
 }
 
 .star-icons {
@@ -3868,4 +3869,10 @@ ul.level1{
   margin: 3% 0 0 !important;
   overflow: hidden;
   height: 145px !important;
+}
+
+.product-reviews-overview {
+  margin-bottom: 12px !important;
+  display: inline-flex !important;
+  gap: 8px !important;
 }

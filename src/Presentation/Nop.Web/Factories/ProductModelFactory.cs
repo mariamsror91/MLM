@@ -30,6 +30,7 @@ using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
+using Nop.Web.Models.Vendors;
 
 namespace Nop.Web.Factories;
 
@@ -80,6 +81,7 @@ public partial class ProductModelFactory : IProductModelFactory
     protected readonly SeoSettings _seoSettings;
     protected readonly ShippingSettings _shippingSettings;
     protected readonly VendorSettings _vendorSettings;
+    protected readonly IVendorModelFactory _vendorModelFactory;
     private static readonly char[] _separator = [','];
 
     #endregion
@@ -125,7 +127,9 @@ public partial class ProductModelFactory : IProductModelFactory
         OrderSettings orderSettings,
         SeoSettings seoSettings,
         ShippingSettings shippingSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings,
+        IVendorModelFactory vendorModelFactory
+)
     {
         _captchaSettings = captchaSettings;
         _catalogSettings = catalogSettings;
@@ -167,6 +171,7 @@ public partial class ProductModelFactory : IProductModelFactory
         _shippingSettings = shippingSettings;
         _vendorSettings = vendorSettings;
         _videoService = videoService;
+        _vendorModelFactory = vendorModelFactory;
     }
 
     #endregion
@@ -202,7 +207,8 @@ public partial class ProductModelFactory : IProductModelFactory
                 model = new ProductSpecificationAttributeModel
                 {
                     Id = attribute.Id,
-                    Name = await _localizationService.GetLocalizedAsync(attribute, x => x.Name)
+                    Name = await _localizationService.GetLocalizedAsync(attribute, x => x.Name),
+
                 };
                 result.Add(model);
             }
@@ -218,7 +224,8 @@ public partial class ProductModelFactory : IProductModelFactory
                     SpecificationAttributeType.CustomHtmlText => await _localizationService.GetLocalizedAsync(psa, x => x.CustomValue),
                     SpecificationAttributeType.Hyperlink => $"<a href='{psa.CustomValue}' target='_blank'>{psa.CustomValue}</a>",
                     _ => null
-                }
+                },
+                Icon = option.Icon
             };
 
             model.Values.Add(value);
@@ -1379,6 +1386,9 @@ public partial class ProductModelFactory : IProductModelFactory
                 SeName = await _urlRecordService.GetSeNameAsync(product),
                 Sku = product.Sku,
                 ProductType = product.ProductType,
+                CreatedOn = product.CreatedOnUtc,
+                City = product.City,
+                Country = product.County,
                 MarkAsNew = product.MarkAsNew &&
                             (!product.MarkAsNewStartDateTimeUtc.HasValue || product.MarkAsNewStartDateTimeUtc.Value < DateTime.UtcNow) &&
                             (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
@@ -1515,7 +1525,10 @@ public partial class ProductModelFactory : IProductModelFactory
             AvailableEndDate = product.AvailableEndDateTimeUtc,
             VisibleIndividually = product.VisibleIndividually,
             AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations,
-            DisplayAttributeCombinationImagesOnly = product.DisplayAttributeCombinationImagesOnly
+            DisplayAttributeCombinationImagesOnly = product.DisplayAttributeCombinationImagesOnly,
+            County = product.County,
+            City = product.City,
+            Coordinates = product.Coordinates
         };
 
         //automatically generate product description?
@@ -1553,13 +1566,8 @@ public partial class ProductModelFactory : IProductModelFactory
             if (vendor != null && !vendor.Deleted && vendor.Active)
             {
                 model.ShowVendor = true;
-
-                model.VendorModel = new VendorBriefInfoModel
-                {
-                    Id = vendor.Id,
-                    Name = await _localizationService.GetLocalizedAsync(vendor, x => x.Name),
-                    SeName = await _urlRecordService.GetSeNameAsync(vendor),
-                };
+                var vendormodel = new VendorInfoModel();
+                model.VendorModel = await _vendorModelFactory.PrepareVendorInfoModelAsync(vendormodel, false, vendorId: vendor.Id);
             }
         }
 

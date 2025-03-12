@@ -23,8 +23,7 @@ public partial class ProductReviewBuilder : NopEntityBuilder<ProductReview>
         table
             .WithColumn(nameof(ProductReview.CustomerId)).AsInt32().ForeignKey<Customer>()
             .WithColumn(nameof(ProductReview.ProductId)).AsInt32().ForeignKey<Product>()
-            .WithColumn(nameof(ProductReview.StoreId)).AsInt32().ForeignKey<Store>()
-            .WithColumn(nameof(ProductReview.VendorId)).AsInt32().ForeignKey<Vendor>();
+            .WithColumn(nameof(ProductReview.StoreId)).AsInt32().ForeignKey<Store>();
 
 
     }

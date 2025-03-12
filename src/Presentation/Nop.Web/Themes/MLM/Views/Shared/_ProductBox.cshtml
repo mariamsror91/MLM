@@ -96,7 +96,7 @@
                 <img src="~/images/locationpinsvgrepocom-1@2x.png" />
 
 <span>
-                    Hittin - Riyadh Saudi Arabia
+                    @Model.City - @Model.Country
 
 </span>
             </div>
@@ -115,7 +115,7 @@
     </div>
 </div>
 <div class="highlight-product-time">
-    <div class="min-ago">30 min ago</div>
+    <div class="min-ago">@Model.CreatedOn.RelativeFormat()</div>
     <div class="highlight-product-sale-type">
         <div class="for-sale">For Sale</div>
     </div>

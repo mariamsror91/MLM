@@ -8,6 +8,7 @@ using Nop.Services.Attributes;
 using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Services.Media;
+using Nop.Services.Seo;
 using Nop.Services.Vendors;
 using Nop.Web.Models.Vendors;
 
@@ -30,6 +31,11 @@ public partial class VendorModelFactory : IVendorModelFactory
     protected readonly IWorkContext _workContext;
     protected readonly MediaSettings _mediaSettings;
     protected readonly VendorSettings _vendorSettings;
+    protected readonly IVendorReviewService _vendorReviews;
+    protected readonly IVendorService _vendorService;
+    protected readonly IUrlRecordService _urlRecordService;
+
+
 
     #endregion
 
@@ -44,7 +50,11 @@ public partial class VendorModelFactory : IVendorModelFactory
         IPictureService pictureService,
         IWorkContext workContext,
         MediaSettings mediaSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings,
+        IVendorReviewService vendorReviews,
+        IVendorService vendorService,
+        IUrlRecordService urlRecordService
+)
     {
         _captchaSettings = captchaSettings;
         _commonSettings = commonSettings;
@@ -56,6 +66,9 @@ public partial class VendorModelFactory : IVendorModelFactory
         _workContext = workContext;
         _mediaSettings = mediaSettings;
         _vendorSettings = vendorSettings;
+        _vendorReviews = vendorReviews;
+        _vendorService = vendorService;
+        _urlRecordService = urlRecordService;
     }
 
     #endregion
@@ -208,16 +221,22 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// The task result contains the vendor info model
     /// </returns>
     public virtual async Task<VendorInfoModel> PrepareVendorInfoModelAsync(VendorInfoModel model,
-        bool excludeProperties, string overriddenVendorAttributesXml = "")
+        bool excludeProperties, int? vendorId, string overriddenVendorAttributesXml = "")
     {
         ArgumentNullException.ThrowIfNull(model);
 
-        var vendor = await _workContext.GetCurrentVendorAsync();
+        var vendor = vendorId.HasValue? await _vendorService.GetVendorByIdAsync(vendorId.Value) : await _workContext.GetCurrentVendorAsync();
         if (!excludeProperties)
         {
             model.Description = vendor.Description;
             model.Email = vendor.Email;
             model.Name = vendor.Name;
+            model.WhatsappLink = vendor.WhatsappLink;
+            model.Phone = vendor.Phone;
+            model.CreatedOnUtc = vendor.CreatedOnUtc;
+            model.AvgReply = vendor.AvgReply;
+            model.AvgReplyRate = vendor.AvgReplyRate;
+            model.SeName = await _urlRecordService.GetSeNameAsync(vendor);
         }
 
         var picture = await _pictureService.GetPictureByIdAsync(vendor.PictureId);
@@ -229,6 +248,10 @@ public partial class VendorModelFactory : IVendorModelFactory
             overriddenVendorAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(vendor, NopVendorDefaults.VendorAttributes);
         model.VendorAttributes = await PrepareVendorAttributesAsync(overriddenVendorAttributesXml);
 
+        var reviews = await _vendorReviews.GetVendorReviewsByVendorIdAsync(vendor.Id, true);
+
+        model.ApprovedRatingSum = reviews.Count > 0 ? reviews.Sum(x => x.Rating)/ reviews.Count :0;
+        model.ApprovedTotalReviews = reviews.Count;
         return model;
     }
 

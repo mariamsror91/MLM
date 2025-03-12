@@ -21,4 +21,7 @@ public partial class SpecificationAttribute : BaseEntity, ILocalizedEntity
     /// Gets or sets the specification attribute group identifier
     /// </summary>
     public int? SpecificationAttributeGroupId { get; set; }
+
+    public string Icon { get; set; }
+
 }

@@ -65,8 +65,5 @@ public partial class ProductReview : BaseEntity
     /// </summary>
     public DateTime CreatedOnUtc { get; set; }
 
-    /// <summary>
-    /// Gets or sets the vendor identifier
-    /// </summary>
-    public int VendorId { get; set; }
+ 
 }

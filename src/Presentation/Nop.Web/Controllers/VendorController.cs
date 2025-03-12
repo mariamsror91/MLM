@@ -44,6 +44,9 @@ public partial class VendorController : BasePublicController
     protected readonly IWorkflowMessageService _workflowMessageService;
     protected readonly LocalizationSettings _localizationSettings;
     protected readonly VendorSettings _vendorSettings;
+    protected readonly IVendorReviewService _vendorReviewService;
+
+    
     private static readonly char[] _separator = [','];
 
     #endregion
@@ -65,7 +68,8 @@ public partial class VendorController : BasePublicController
         IWorkContext workContext,
         IWorkflowMessageService workflowMessageService,
         LocalizationSettings localizationSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings,
+        IVendorReviewService vendorReviewService)
     {
         _captchaSettings = captchaSettings;
         _vendorAttributeParser = vendorAttributeParser;
@@ -83,6 +87,7 @@ public partial class VendorController : BasePublicController
         _workflowMessageService = workflowMessageService;
         _localizationSettings = localizationSettings;
         _vendorSettings = vendorSettings;
+        _vendorReviewService = vendorReviewService;
     }
 
     #endregion
@@ -300,7 +305,7 @@ public partial class VendorController : BasePublicController
             return RedirectToRoute("CustomerInfo");
 
         var model = new VendorInfoModel();
-        model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, false);
+        model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, false,null);
         return View(model);
     }
 
@@ -379,7 +384,7 @@ public partial class VendorController : BasePublicController
         }
 
         //If we got this far, something failed, redisplay form
-        model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, true, vendorAttributesXml);
+        model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, true, vendor.Id);
         return View(model);
     }
 
@@ -407,6 +412,33 @@ public partial class VendorController : BasePublicController
             await _workflowMessageService.SendVendorInformationChangeStoreOwnerNotificationAsync(vendor, _localizationSettings.DefaultAdminLanguageId);
 
         return RedirectToAction("Info");
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> SubmitVendorReview(int vendorId, VendorReviewModel model)
+    {
+        var customer = await _workContext.GetCurrentCustomerAsync();
+        var vendor = await _vendorService.GetVendorByIdAsync(vendorId);
+
+        if (!await _vendorReviewService.CanCustomerReviewVendorAsync(customer.Id, vendorId))
+        {
+            ModelState.AddModelError("", "You cannot review this vendor.");
+            return RedirectToAction("Info", new { vendorId });
+        }
+
+        var vendorReview = new VendorReview
+        {
+            VendorId = vendorId,
+            CustomerId = customer.Id,
+            Title = model.Title,
+            ReviewText = model.ReviewText,
+            Rating = model.Rating,
+            IsApproved = true // Require admin approval
+        };
+
+        await _vendorReviewService.InsertVendorReviewAsync(vendorReview);
+        return RedirectToAction("Info", new { vendorId });
     }
 
     #endregion

@@ -68,7 +68,6 @@
     }
 }
 <!--product breadcrumb-->
-
 @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsAfterBreadcrumb, additionalData = Model })
 <div class="page product-details-page">
     <div class="page-body">
@@ -103,19 +102,19 @@
                         }
                     </div>
                     <div class="overview @StickyColumn">
-                      
-                            @await Html.PartialAsync("_ProductBreadcrumb", Model.Breadcrumb)
-                       
+
+                        @await Html.PartialAsync("_ProductBreadcrumb", Model.Breadcrumb)
+
                         <div class="middle">
                             <!--manufacturers-->
-                         @*    @await Html.PartialAsync("_ProductManufacturers", Model.ProductManufacturers)
+                            @*    @await Html.PartialAsync("_ProductManufacturers", Model.ProductManufacturers)
                             @await Html.PartialAsync("_ShareButton", Model) *@
-                           
+
                             <div class="product-title">
                                 <span>@Model.Name</span>
                                 @await Component.InvokeAsync("Widget", new { widgetZone = "productname_inside", additionalData = Model.Id })
                                 <div class="overview-buttons">
-                                    <a class="share-url"> 
+                                    <a class="share-url">
                                         <img src="~/images/rishareline.svg" />
 
                                     </a>
@@ -144,11 +143,11 @@
                             @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsOverviewTop, additionalData = Model })
 
                             @await Html.PartialAsync("_Discontinued", Model)
-                          
-                        
-                          @*   <!--SKU, MAN, GTIN, vendor-->
+
+
+                            @*   <!--SKU, MAN, GTIN, vendor-->
                             @await Html.PartialAsync("_SKU_Man_GTIN_Ven", Model) *@
-                       
+
                             <!--attributes-->
                             @{
                                 // var dataDictAttributes = new ViewDataDictionary(ViewData);
@@ -157,13 +156,13 @@
                             }
                             @if (!string.IsNullOrEmpty(Model.ShortDescription))
                             {
-                              @*   <div class="short-description">
+                                @*   <div class="short-description">
                                     @Html.Raw(Model.ShortDescription)
                                 </div> *@
                             }
                             <!--gift card-->
                             @{
-                                // var dataDictGiftCard = new ViewDataDictionary(ViewData);
+            // var dataDictGiftCard = new ViewDataDictionary(ViewData);
                                 // dataDictGiftCard.TemplateInfo.HtmlFieldPrefix = $"giftcard_{Model.Id}";
                                 // @await Html.PartialAsync("_GiftCardInfo", Model.GiftCard, dataDictGiftCard)
                             }
@@ -179,17 +178,18 @@
                                 <button class="contact-btn btn-dark">
                                     <img src="images/vuesaxlinearcall.svg" />
 
-                                   <span>
-                                        Call +966 21561511
-                                   </span> 
+                                    <span>
+                                        Call @Model.VendorModel.Phone
+                                    </span>
                                 </button>
-                                <button class="contact-btn  btn-light ">
+                                <a href="@Model.VendorModel.WhatsappLink" class="contact-btn  btn-light ">
                                     <img src="images/riwhatsappfill.svg" />
+                                   
 
                                     <span>
                                         Whats app Me
-                                    </span> 
-                                </button>
+                                    </span>
+                                </a>
                             </div>
                             <!--price breaks-->
                             @await Html.PartialAsync("_ProductTierPrices", Model.TierPrices)
@@ -199,35 +199,66 @@
                                     <img src="images/vuesaxlinearlocation1.svg" />
 
                                     <span>
-                                        Hittin - Riyadh Saudi Arabia
+                                        @Model.City - @Model.County
 
                                     </span>
                                 </div>
 
-                                <button class="map-link">
+                                <a href="@Model.Coordinates" class="map-link">
                                     <img class="logosgoogle-maps-icon" alt="" src="images/logosgooglemaps.svg">
-
-                                    <div class="view-on-maps">View On Maps</div>
-                                </button>
-                               
+                                    <div class="view-on-maps">
+                                            View On Maps
+                                    </div>
+                                </a>
                             </div>
                         </div>
 
-                     
+
                         <div class="advertiser">
                             <div class="advertiser-child"></div>
                             <div class="about-the-advertiser">About the Advertiser</div>
                             <div class="advertiser-details">
                                 <div class="profile-container">
-                                    <img class="profile-picture-icon" loading="lazy" alt="" src="images/ellipse-4171@2x.png">
+                                    <img class="profile-picture-icon" loading="lazy" alt="" src="@Model.VendorModel.PictureUrl">
 
                                     <div class="profile-info">
-                                        <div class="salem-elmosalamani">Salem Elmosalamani</div>
+                                        <div class="salem-elmosalamani">@Model.VendorModel.Name</div>
                                         <div class="review-container">
                                             <div class="rating-container">
-                                                <div class="empty-rating">5.0</div>
-                                                <div class="rating-stars">
-                                                    <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg">
+                                                <div class="product-reviews-overview">
+                                                    @*  @if (Model.VendorModel.ApprovedTotalReviews > 0)
+                                                    {
+                                                        <div class="product-review-links">
+                                                            <a href="#productreviews">@Model.VendorModel.ApprovedTotalReviews @T("Reviews.Overview.Reviews")</a>
+                                                          @if (Model.CanAddNewReview)
+                                                            {
+                                                                <span class="separator">|</span>
+                                                                <a href="#addreview" onclick="$('.write-review-button').trigger('click')">@T("Reviews.Overview.AddNew")</a>
+                                                            } 
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="product-no-reviews">
+                                                            <a href="#addreview" onclick="$('.write-review-button').trigger('click')">@T("Reviews.Overview.First")</a>
+                                                        </div>
+                                                    } *@
+                                                    <div class="empty-rating">@Model.VendorModel.ApprovedRatingSum</div>
+                                                    <div class="rating-stars">
+                                                        <div class="rating-box">
+                                                            <div class="rating-icons">
+                                                                @{
+                                                                    var ratingPercent = 0;
+                                                                    if (Model.VendorModel.ApprovedTotalReviews != 0)
+                                                                    {
+                                                                        ratingPercent = ((@Model.VendorModel.ApprovedRatingSum * 100) / Model.VendorModel.ApprovedTotalReviews) / 5;
+                                                                    }
+                                                                }
+                                                                <div class="rating" style="width: @(ratingPercent)%">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @*    <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg">
 
                                                     <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg">
 
@@ -235,32 +266,44 @@
 
                                                     <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg">
 
-                                                    <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg">
+                                                    <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg"> *@
+                                                   
                                                 </div>
+                                                <a class="reviews">@Model.VendorModel.ApprovedTotalReviews @T("Reviews.Overview.Reviews")</a>
                                             </div>
-                                            <a class="reviews">8 Reviews</a>
                                         </div>
                                     </div>
                                 </div>
+                                </div>
+
                                 <div class="response-info">
                                     <div class="response-details">
                                         <div class="response-elements">
-                                            <div class="hrs">4 hrs</div>
+@*                                             <div class="hrs">@Model.VendorModel.AvgReply</div>
+ *@                                            <div class="hrs">@(string.IsNullOrEmpty(Model.VendorModel.AvgReply) ? 0 : Model.VendorModel.AvgReply) Hrs</div>
+
                                             <a class="avg-reply">avg reply</a>
                                         </div>
                                         <div class="response-elements1"></div>
                                         <div class="response-elements2">
-                                            <div class="div">42%</div>
+                                            <div class="div">@(string.IsNullOrEmpty(Model.VendorModel.AvgReplyRate) ? 0 : Model.VendorModel.AvgReplyRate)%</div>
                                             <div class="reply-rate">reply rate</div>
                                         </div>
                                         <div class="response-elements1"></div>
                                         <div class="response-elements4">
-                                            <div class="years">1 years</div>
+                                            <div class="years">@(Model.VendorModel.CreatedOnUtc.RelativeFormat())</div>
                                             <div class="member-since">member since</div>
                                         </div>
                                     </div>
+
+                                        
                                 </div>
-                            </div>
+                              
+
+
+                            @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsOverviewBottom, additionalData = Model })
+                        </div>
+
                             <div class="listing-link">
                                 <div class="link-content" id="linkContentContainer">
                                     <div class="view-13-listing">
@@ -271,15 +314,12 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-
-
-                        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsOverviewBottom, additionalData = Model })
+                        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                     </div>
-					@await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
-                                    </div>
-                @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBeforeCollateral, additionalData = Model })
+                    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBeforeCollateral, additionalData = Model })
+                    
+                </div>
+            </div>
                 <div class="product-collateral">
                     @await Html.PartialAsync("_ProductSpecifications", Model.ProductSpecificationModel)
 
@@ -289,21 +329,22 @@
                             <div class="title">
                                 About This Product
                             </div>
-                            </div>
+                        </div>
                         <div class="full-description">
                             @Html.Raw(Model.FullDescription)
                         </div>
                     }
-@*                     @await Html.PartialAsync("_ProductTags", Model.ProductTags)
- *@                </div>
+                    @*                     @await Html.PartialAsync("_ProductTags", Model.ProductTags)
+ *@
+                </div>
             </div>
         </form>
         <!--product reviews-->
-       @*  @if (Model.ProductReviewOverview.AllowCustomerReviews)
+        @*  @if (Model.ProductReviewOverview.AllowCustomerReviews)
         {
             @await Html.PartialAsync("_ProductReviews", Model.ProductReviews)
         } *@
-     @*    @await Component.InvokeAsync(typeof(ProductsAlsoPurchasedViewComponent), new { productId = Model.Id })
+        @*    @await Component.InvokeAsync(typeof(ProductsAlsoPurchasedViewComponent), new { productId = Model.Id })
         @await Component.InvokeAsync(typeof(RelatedProductsViewComponent), new { productId = Model.Id })
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
      *@

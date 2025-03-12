@@ -11,7 +11,7 @@
        
        @*  *@
 
-        <div class="room-amenities">
+       @*  <div class="room-amenities">
             <div class="amenities">
                 <img class="room-details-child" loading="lazy" alt="" src="images/group-1171275021.svg">
 
@@ -42,7 +42,7 @@
 
                 <div class="private-pool">Workspace</div>
             </div>
-        </div>
+        </div> *@
         <div class="room-amenities">
             @foreach (var group in Model.Groups)
             {
@@ -71,18 +71,11 @@
                             { *@
 
                             <div class="amenities">
-                                <img class="room-details-child" loading="lazy" alt="" src="images/group-1171275021.svg">
+                                <img class="room-details-child" loading="lazy" alt="" src="@Url.Content(value.Icon)">
 
                                 <div class="bathroom"> @Html.Raw(value.ValueRaw)</div>
                             </div>
 
-
-                               
-                                if (j != attr.Values.Count - 1)
-                                {
-                                    <text>,&nbsp;</text>
-                                }
-                            @* } *@
                         }
 
                     }

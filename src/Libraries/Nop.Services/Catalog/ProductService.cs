@@ -2495,12 +2495,12 @@ public partial class ProductService : IProductService
                 query = query.Where(pr => pr.ProductId == productId);
 
             query = from productReview in query
-                join product in _productRepository.Table on productReview.ProductId equals product.Id
-                where
-                    (vendorId == 0 || product.VendorId == vendorId) &&
-                    //ignore deleted products
-                    !product.Deleted
-                select productReview;
+                    join product in _productRepository.Table on productReview.ProductId equals product.Id
+                    where
+                        (vendorId == 0 || product.VendorId == vendorId) &&
+                        //ignore deleted products
+                        !product.Deleted
+                    select productReview;
 
             query = _catalogSettings.ProductReviewsSortByCreatedDateAscending
                 ? query.OrderBy(pr => pr.CreatedOnUtc).ThenBy(pr => pr.Id)

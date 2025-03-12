@@ -1525,6 +1525,7 @@ public partial class ProductModelFactory : IProductModelFactory
                         productSpecificationAttributeModel.ValueRaw = attribute.CustomValue;
                         break;
                 }
+                productSpecificationAttributeModel.IconUrl = specAttributeOption.Icon;
 
                 return productSpecificationAttributeModel;
             });

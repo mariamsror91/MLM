@@ -24,5 +24,7 @@ public partial record ProductSpecificationAttributeValueModel : BaseNopModel
     /// </summary>
     public string ColorSquaresRgb { get; set; }
 
+    public string Icon { get; set; }
+
     #endregion
 }

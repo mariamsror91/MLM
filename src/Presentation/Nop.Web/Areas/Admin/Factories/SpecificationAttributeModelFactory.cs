@@ -314,6 +314,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         }
 
         model.SpecificationAttributeId = specificationAttribute.Id;
+        model.IconUrl = specificationAttributeOption.Icon;
 
         //prepare localized models
         if (!excludeProperties)

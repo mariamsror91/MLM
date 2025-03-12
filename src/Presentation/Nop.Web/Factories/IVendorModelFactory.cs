@@ -30,5 +30,6 @@ public partial interface IVendorModelFactory
     /// A task that represents the asynchronous operation
     /// The task result contains the vendor info model
     /// </returns>
-    Task<VendorInfoModel> PrepareVendorInfoModelAsync(VendorInfoModel model, bool excludeProperties, string overriddenVendorAttributesXml = "");
+    Task<VendorInfoModel> PrepareVendorInfoModelAsync(VendorInfoModel model,
+        bool excludeProperties, int? vendorId, string overriddenVendorAttributesXml = "");
 }
