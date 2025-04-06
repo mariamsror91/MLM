@@ -39,5 +39,7 @@ public enum CustomerNavigationEnum
     GdprTools = 120,
     CheckGiftCardBalance = 130,
     MultiFactorAuthentication = 140,
-    Wallet = 150
+    Wallet = 150,
+    WishList = 160,
+
 }

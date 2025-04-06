@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Nop.Services.Vendors;
 public interface IVendorReviewService
 {
-    Task InsertVendorReviewAsync(VendorReview vendorReview);
+    Task<int>InsertVendorReviewAsync(VendorReview vendorReview);
     Task UpdateVendorReviewAsync(VendorReview vendorReview);
     Task DeleteVendorReviewAsync(VendorReview vendorReview);
     Task<VendorReview> GetVendorReviewByIdAsync(int vendorReviewId);

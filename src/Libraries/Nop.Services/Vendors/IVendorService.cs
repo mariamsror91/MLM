@@ -1,4 +1,5 @@
 ﻿using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Vendors;
 
 namespace Nop.Services.Vendors;
@@ -125,4 +126,8 @@ public partial interface IVendorService
     /// <param name="vendorNote">Vendor note</param>
     /// <returns>Formatted text</returns>
     string FormatVendorNoteText(VendorNote vendorNote);
+
+    Task<int> GetVendorProductsCount(int vendorId);
+    Task<IList<Product>> GetVendorProducts(int vendorId);
+
 }

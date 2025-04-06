@@ -2513,39 +2513,43 @@ order-details-page .cart, .data-table,
       font-size: 0;
     }
 
-    .item-box .rating-icons,
-    .overview .rating-icons,
-    .search-box .rating-icons {
-      display: inline-block;
-      position: relative;
-      height: 11px;
-      color: #f6e030;
-      white-space: nowrap;
-      letter-spacing: 3px;
+  .item-box .rating-icons,
+  .overview .rating-icons,
+  .search-box .rating-icons,
+  .rating-icons {
+    display: inline-block;
+    position: relative;
+    height: 11px;
+    color: #f6e030;
+    white-space: nowrap;
+    letter-spacing: 3px;
+  }
+
+    .item-box .rating-icons:before,
+    .overview .rating-icons:before,
+    .search-box .rating-icons:before,
+    .rating-icons:before {
+      content: "\e900 \e900 \e900 \e900 \e900";
+      position: absolute;
+      right: 0;
+      font-size: 10px;
     }
 
-      .item-box .rating-icons:before,
-      .overview .rating-icons:before,
-      .search-box .rating-icons:before {
-        content: "\e900 \e900 \e900 \e900 \e900";
-        position: absolute;
-        right: 0;
+    .item-box .rating-icons .rating,
+    .overview .rating-icons .rating,
+    .search-box .rating-icons .rating,
+    .rating-icons .rating {
+      position: relative;
+      overflow: hidden;
+    }
+
+      .item-box .rating-icons .rating:before,
+      .overview .rating-icons .rating:before,
+      .search-box .rating-icons .rating:before,
+      .rating-icons .rating:before {
+        content: "\e901 \e901 \e901 \e901 \e901";
         font-size: 10px;
       }
-
-      .item-box .rating-icons .rating,
-      .overview .rating-icons .rating,
-      .search-box .rating-icons .rating {
-        position: relative;
-        overflow: hidden;
-      }
-
-        .item-box .rating-icons .rating:before,
-        .overview .rating-icons .rating:before,
-        .search-box .rating-icons .rating:before {
-          content: "\e901 \e901 \e901 \e901 \e901";
-          font-size: 10px;
-        }
 
     .item-box .description {
       display: none; /*unsupported*/

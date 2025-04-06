@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nop.Services.Vendors;
+﻿namespace Nop.Services.Vendors;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
@@ -35,9 +29,9 @@ public class VendorReviewService : IVendorReviewService
         _productRepository = productRepository;
     }
 
-    public async Task InsertVendorReviewAsync(VendorReview vendorReview)
+    public async Task<int> InsertVendorReviewAsync(VendorReview vendorReview)
     {
-        await _vendorReviewRepository.InsertAsync(vendorReview);
+       return await _vendorReviewRepository.InsertIdAsync(vendorReview);
     }
 
     public async Task UpdateVendorReviewAsync(VendorReview vendorReview)

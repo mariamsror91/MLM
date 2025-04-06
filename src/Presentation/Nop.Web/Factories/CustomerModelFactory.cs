@@ -601,13 +601,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             ItemClass = "customer-addresses"
         });
 
-        model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-        {
-            RouteName = "CustomerOrders",
-            Title = await _localizationService.GetResourceAsync("Account.CustomerOrders"),
-            Tab = (int)CustomerNavigationEnum.Orders,
-            ItemClass = "customer-orders"
-        });
+        //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+        //{
+        //    RouteName = "CustomerOrders",
+        //    Title = await _localizationService.GetResourceAsync("Account.CustomerOrders"),
+        //    Tab = (int)CustomerNavigationEnum.Orders,
+        //    ItemClass = "customer-orders"
+        //});
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
@@ -616,54 +616,54 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             (await _returnRequestService.SearchReturnRequestsAsync(store.Id,
                 customer.Id, pageIndex: 0, pageSize: 1)).Any())
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerReturnRequests",
-                Title = await _localizationService.GetResourceAsync("Account.CustomerReturnRequests"),
-                Tab = (int)CustomerNavigationEnum.ReturnRequests,
-                ItemClass = "return-requests"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerReturnRequests",
+            //    Title = await _localizationService.GetResourceAsync("Account.CustomerReturnRequests"),
+            //    Tab = (int)CustomerNavigationEnum.ReturnRequests,
+            //    ItemClass = "return-requests"
+            //});
         }
 
         if (!_customerSettings.HideDownloadableProductsTab)
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerDownloadableProducts",
-                Title = await _localizationService.GetResourceAsync("Account.DownloadableProducts"),
-                Tab = (int)CustomerNavigationEnum.DownloadableProducts,
-                ItemClass = "downloadable-products"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerDownloadableProducts",
+            //    Title = await _localizationService.GetResourceAsync("Account.DownloadableProducts"),
+            //    Tab = (int)CustomerNavigationEnum.DownloadableProducts,
+            //    ItemClass = "downloadable-products"
+            //});
         }
 
         if (!_customerSettings.HideBackInStockSubscriptionsTab)
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerBackInStockSubscriptions",
-                Title = await _localizationService.GetResourceAsync("Account.BackInStockSubscriptions"),
-                Tab = (int)CustomerNavigationEnum.BackInStockSubscriptions,
-                ItemClass = "back-in-stock-subscriptions"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerBackInStockSubscriptions",
+            //    Title = await _localizationService.GetResourceAsync("Account.BackInStockSubscriptions"),
+            //    Tab = (int)CustomerNavigationEnum.BackInStockSubscriptions,
+            //    ItemClass = "back-in-stock-subscriptions"
+            //});
         }
 
         if (_rewardPointsSettings.Enabled)
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerRewardPoints",
-                Title = await _localizationService.GetResourceAsync("Account.RewardPoints"),
-                Tab = (int)CustomerNavigationEnum.RewardPoints,
-                ItemClass = "reward-points"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerRewardPoints",
+            //    Title = await _localizationService.GetResourceAsync("Account.RewardPoints"),
+            //    Tab = (int)CustomerNavigationEnum.RewardPoints,
+            //    ItemClass = "reward-points"
+            //});
         }
-        model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-        {
-            RouteName = "CustomerWallet",
-            Title = await _localizationService.GetResourceAsync("Account.Wallet"),
-            Tab = (int)CustomerNavigationEnum.Wallet,
-            ItemClass = "reward-points"
-        });
+        //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+        //{
+        //    RouteName = "CustomerWallet",
+        //    Title = await _localizationService.GetResourceAsync("Account.Wallet"),
+        //    Tab = (int)CustomerNavigationEnum.Wallet,
+        //    ItemClass = "reward-points"
+        //});
         model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
         {
             RouteName = "CustomerChangePassword",
@@ -695,23 +695,23 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         }
         if (_catalogSettings.ShowProductReviewsTabOnAccountPage)
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerProductReviews",
-                Title = await _localizationService.GetResourceAsync("Account.CustomerProductReviews"),
-                Tab = (int)CustomerNavigationEnum.ProductReviews,
-                ItemClass = "customer-reviews"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerProductReviews",
+            //    Title = await _localizationService.GetResourceAsync("Account.CustomerProductReviews"),
+            //    Tab = (int)CustomerNavigationEnum.ProductReviews,
+            //    ItemClass = "customer-reviews"
+            //});
         }
         if (_vendorSettings.AllowVendorsToEditInfo && await _workContext.GetCurrentVendorAsync() != null)
         {
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerVendorInfo",
-                Title = await _localizationService.GetResourceAsync("Account.VendorInfo"),
-                Tab = (int)CustomerNavigationEnum.VendorInfo,
-                ItemClass = "customer-vendor-info"
-            });
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerVendorInfo",
+            //    Title = await _localizationService.GetResourceAsync("Account.VendorInfo"),
+            //    Tab = (int)CustomerNavigationEnum.VendorInfo,
+            //    ItemClass = "customer-vendor-info"
+            //});
         }
         if (_gdprSettings.GdprEnabled)
         {
@@ -746,6 +746,14 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 ItemClass = "customer-multiFactor-authentication"
             });
         }
+
+        model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+        {
+            RouteName = "Wishlist",
+            Title = await _localizationService.GetResourceAsync("Account.Wishlist"),
+            Tab = (int)CustomerNavigationEnum.WishList,
+            ItemClass = "customer-wishlist"
+        });
 
         model.SelectedTab = selectedTabId;
 
@@ -872,6 +880,19 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     {
         ArgumentNullException.ThrowIfNull(model);
 
+        model.AvatarUrl = await _pictureService.GetPictureUrlAsync(
+            await _genericAttributeService.GetAttributeAsync<int>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.AvatarPictureIdAttribute),
+            _mediaSettings.AvatarPictureSize,
+            false);
+
+        return model;
+    }
+
+    public virtual async Task<CustomerAvatarModel> PrepareCustomerAvatarModelAsync(int customerId)
+    {
+       // ArgumentNullException.ThrowIfNull(model);
+        var model = new CustomerAvatarModel();
+        var customer = await _customerService.GetCustomerByIdAsync(customerId);
         model.AvatarUrl = await _pictureService.GetPictureUrlAsync(
             await _genericAttributeService.GetAttributeAsync<int>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.AvatarPictureIdAttribute),
             _mediaSettings.AvatarPictureSize,

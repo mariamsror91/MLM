@@ -1422,6 +1422,12 @@ public partial class ProductModelFactory : IProductModelFactory
             //tags
             model.ProductTags = await PrepareProductTagModelsAsync(product);
 
+            var vendor = await _vendorService.GetVendorByIdAsync(product.VendorId);
+            if (vendor != null && !vendor.Deleted && vendor.Active)
+            {
+                var vendormodel = new VendorInfoModel();
+                model.VendorModel = await _vendorModelFactory.PrepareVendorInfoModelAsync(vendormodel, false, vendorId: vendor.Id);
+            }
 
             models.Add(model);
         }

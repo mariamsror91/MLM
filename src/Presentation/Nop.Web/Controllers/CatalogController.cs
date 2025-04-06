@@ -19,6 +19,7 @@ using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Models.Catalog;
+using Nop.Web.Models.Vendors;
 
 namespace Nop.Web.Controllers;
 
@@ -48,6 +49,11 @@ public partial class CatalogController : BasePublicController
     protected readonly IWorkContext _workContext;
     protected readonly MediaSettings _mediaSettings;
     protected readonly VendorSettings _vendorSettings;
+    protected readonly ITagService _tagService;
+    protected readonly IVendorReviewService _vendorReviewService;
+
+
+
 
     #endregion
 
@@ -73,7 +79,8 @@ public partial class CatalogController : BasePublicController
         IWebHelper webHelper,
         IWorkContext workContext,
         MediaSettings mediaSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings,
+        ITagService tagService)
     {
         _catalogSettings = catalogSettings;
         _aclService = aclService;
@@ -96,6 +103,7 @@ public partial class CatalogController : BasePublicController
         _workContext = workContext;
         _mediaSettings = mediaSettings;
         _vendorSettings = vendorSettings;
+        _tagService = tagService;
     }
 
     #endregion
@@ -271,6 +279,55 @@ public partial class CatalogController : BasePublicController
 
         var model = await _catalogModelFactory.PrepareVendorAllModelsAsync();
         return View(model);
+    }
+
+    public async Task<IActionResult> SubmitVendorReviewPopup(int vendorId)
+    {
+        var tags = (await _tagService.GetAllFeedbackTagsAsync()).Select(x => new VendorTopTag()
+        {
+            Id = x.Id,
+            Tag = x.Tag
+        }).ToList();
+        var model = new VendorReviewModel
+        {
+            VendorId = vendorId,
+            AvailableTags = tags
+        };
+        return PartialView("_SubmitReview", model);
+    }
+
+    [HttpPost]
+    [ValidateCaptcha]
+    public async Task<IActionResult> SubmitVendorReview(VendorReviewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            model.AvailableTags = (await _tagService.GetAllFeedbackTagsAsync()).Select(x=> new VendorTopTag () {
+                Id = x.Id,
+                Tag = x.Tag 
+            }).ToList();
+            model.VendorId = model.VendorId;
+            return Json(new
+            {
+                success = false,
+                html = await RenderPartialViewToStringAsync("_SubmitReview", model)
+            });
+        }
+
+        // Save review and tags (use your existing review service)
+      var id =  await _vendorReviewService.InsertVendorReviewAsync(new VendorReview() {
+            CreatedOnUtc = DateTime.UtcNow,
+            VendorId = model.VendorId,
+           CustomerId = (await _workContext.GetCurrentCustomerAsync()).Id,
+           Rating = model.Rating,
+           ReviewText = model.ReviewText,
+           Title = model.Title,
+           IsApproved = true
+       });
+
+        await _tagService.AddFeedbackTags(id, model.VendorId, model.SelectedTagIds);
+
+        return Json(new { success = true });
     }
 
     #endregion

@@ -14,7 +14,7 @@
 /* CATEGORY PAGE & GRIDS */
 
 .item-box {
-	width: 23.5%; /*four per row*/
+	/*width: 23.5%;*/ /*four per row*/
 }
 .item-box:nth-child(3n+1) {
 	/*clear: none;*/ /*revert the fourth item*/

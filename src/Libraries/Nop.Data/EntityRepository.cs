@@ -437,6 +437,18 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
             await _eventPublisher.EntityInsertedAsync(entity);
     }
 
+    public virtual async Task<int> InsertIdAsync(TEntity entity, bool publishEvent = true)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        await _dataProvider.InsertEntityAsync(entity);
+
+        //event notification
+        if (publishEvent)
+            await _eventPublisher.EntityInsertedAsync(entity);
+        return entity.Id;
+    }
+
     /// <summary>
     /// Insert the entity entry
     /// </summary>

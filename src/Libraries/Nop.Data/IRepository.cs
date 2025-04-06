@@ -150,6 +150,7 @@ public partial interface IRepository<TEntity> where TEntity : BaseEntity
     /// <returns>A task that represents the asynchronous operation</returns>
     Task InsertAsync(IList<TEntity> entities, bool publishEvent = true);
 
+    Task<int> InsertIdAsync(TEntity entity, bool publishEvent = true);
     /// <summary>
     /// Insert entity entries
     /// </summary>

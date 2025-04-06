@@ -232,11 +232,12 @@ input[type="checkbox"]:checked ~ label:before {
 	background-color: #f61853;
 }
 
-.master-wrapper-content {
+/*.master-wrapper-content {
 	position: relative;
-	z-index: 0; /*giving priority to header*/
-	padding: 35px 4% 0;
-}
+	z-index: 0;*/
+/*giving priority to header disabled form mlm*/ 
+	/*padding: 35px 4% 0;
+}*/
 .master-column-wrapper:after {
 	content: "";
 	display: block;
@@ -4455,7 +4456,7 @@ margin-bottom:12px;
         background: none !important;
         box-shadow: none;
         font-size: 14px;
-        color: #f6e030;
+        /*color: #f6e030;*/
       }
 
     .write-review .rating-options
@@ -4463,15 +4464,16 @@ margin-bottom:12px;
       content: "\e900";
     }
 
-  .write-review .button-1 {
-    min-width: 180px;
-    outline: 1px solid transparent;
-    background-color: #222;
-    padding: 15px 25px;
-    color: #fff;
-    text-transform: uppercase;
-    transition: all 0.2s ease;
-  }
+
+.write-review .button-1 {
+  min-width: 180px;
+  outline: 1px solid transparent;
+  background-color: #222;
+  padding: 15px 25px;
+  color: #fff;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
 
     .write-review .button-1:hover {
       outline-color: #222;

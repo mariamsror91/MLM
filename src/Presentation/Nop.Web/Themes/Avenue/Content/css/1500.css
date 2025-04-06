@@ -59,7 +59,7 @@
 /* CATEGORY PAGE & GRIDS */
 
 .center-1 .item-box {
-	width: 18.4%; /*five per row*/
+	/*width: 18.4%;*/   /*five per row*/
 }
 .center-1 .item-box:nth-child(4n+1) {
 	/*clear: none;*/ /*revert the fifth item*/
@@ -67,7 +67,7 @@
 }
 .center-1 .item-box:nth-child(5n+1) {
 	/*clear: both;*/
-	margin-left: 0;
+	/*margin-left: 0;*/
 }
 
 .center-2 .item-box {

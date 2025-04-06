@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
+using Nop.Web.Models.Vendors;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -14,6 +15,8 @@ public partial record ProductOverviewModel : BaseNopEntityModel
         ReviewOverviewModel = new ProductReviewOverviewModel();
         ProductTags = new List<ProductTagModel>();
         ProductAttributes = new List<ProductDetailsModel.ProductAttributeModel>();
+        VendorModel = new VendorInfoModel();
+
 
     }
 
@@ -48,6 +51,7 @@ public partial record ProductOverviewModel : BaseNopEntityModel
 
     public IList<ProductDetailsModel.ProductAttributeModel> ProductAttributes { get; set; }
 
+    public VendorInfoModel VendorModel { get; set; }
 
     #region Nested Classes
 

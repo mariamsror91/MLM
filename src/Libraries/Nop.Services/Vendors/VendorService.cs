@@ -244,5 +244,18 @@ public partial class VendorService : IVendorService
         return text;
     }
 
+
+    public virtual async Task<int> GetVendorProductsCount (int vendorId)
+    {
+        return await _productRepository.Table.Where(x => x.VendorId == vendorId).CountAsync();
+
+    }
+
+
+    public virtual async Task<IList<Product>> GetVendorProducts(int vendorId)
+    {
+        return await _productRepository.Table.Where(x => x.VendorId == vendorId).ToListAsync();
+    }
+
     #endregion
 }

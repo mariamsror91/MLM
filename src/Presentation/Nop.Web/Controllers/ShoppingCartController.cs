@@ -771,7 +771,7 @@ public partial class ShoppingCartController : BasePublicController
             //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
             updatecartitem.ShoppingCartType;
         var method = form[$"addtocart_{product.Id.ToString()}.SelectedShippingMethod"];
-        var selectedShippingMethod = int.Parse(method);
+        var selectedShippingMethod = 0;
         await SaveItemAsync(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity, selectedShippingMethod);
 
         //return result

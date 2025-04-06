@@ -25,7 +25,7 @@ public partial record VendorInfoModel : BaseNopModel
     [NopResourceDisplayName("Account.VendorInfo.Picture")]
     public string PictureUrl { get; set; }
 
-    public int ApprovedRatingSum { get; set; }
+    public decimal ApprovedRatingSum { get; set; }
     public int NotApprovedRatingSum { get; set; }
     public int ApprovedTotalReviews { get; set; }
     public int NotApprovedTotalReviews { get; set; }
@@ -48,6 +48,9 @@ public partial record VendorInfoModel : BaseNopModel
     public IList<VendorAttributeModel> VendorAttributes { get; set; }
 
     public IList<VendorReviewModel> VendorReviews { get; set; }
+
+    public int VendorProductsCount { get; set; }
+
 
 
 }

@@ -6,6 +6,7 @@
 @using Nop.Services.Configuration
 @using Nop.Services.Html
 @using Microsoft.AspNetCore.Html;
+@using Nop.Core.Domain.Vendors
 
 @inject IHtmlFormatter htmlFormatter
 @inject ISettingService settingService
@@ -248,10 +249,10 @@
                                                         <div class="rating-box">
                                                             <div class="rating-icons">
                                                                 @{
-                                                                    var ratingPercent = 0;
+                                                                    decimal ratingPercent = 0;
                                                                     if (Model.VendorModel.ApprovedTotalReviews != 0)
                                                                     {
-                                                                        ratingPercent = ((@Model.VendorModel.ApprovedRatingSum * 100) / Model.VendorModel.ApprovedTotalReviews) / 5;
+                                                                        ratingPercent = (@Model.VendorModel.ApprovedRatingSum * 100) / 5;
                                                                     }
                                                                 }
                                                                 <div class="rating" style="width: @(ratingPercent)%">
@@ -269,7 +270,9 @@
                                                     <img class="star-icons" loading="lazy" alt="" src="images/star-1.svg"> *@
                                                    
                                                 </div>
-                                                <a class="reviews">@Model.VendorModel.ApprovedTotalReviews @T("Reviews.Overview.Reviews")</a>
+                                                    <a class="reviews" href="@(Url.RouteUrl<Vendor>(new { SeName = Model.VendorModel.SeName, reviews = 2 }))">
+                                                    @Model.VendorModel.ApprovedTotalReviews @T("Reviews.Overview.Reviews")
+                                                    </a>
                                             </div>
                                         </div>
                                     </div>
@@ -307,7 +310,10 @@
                             <div class="listing-link">
                                 <div class="link-content" id="linkContentContainer">
                                     <div class="view-13-listing">
-                                        View 13 Listing for advertising
+                                        <a href="@(Url.RouteUrl<Vendor>(new { SeName = Model.VendorModel.SeName,reviews = 1 }))">
+                                            View @Model.VendorModel.VendorProductsCount Listing for advertising
+                                        </a>
+                                        
                                     </div>
                                     <div class="vuesaxlinearlocation-wrapper">
                                         <img class="link-icon-container-child" alt="" src="images/vector-25.svg">

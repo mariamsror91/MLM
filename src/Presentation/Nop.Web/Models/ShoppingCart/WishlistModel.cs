@@ -74,6 +74,12 @@ public partial record WishlistModel : BaseNopModel
         public bool AllowItemEditing { get; set; }
 
         public IList<string> Warnings { get; set; }
+
+        public DateTime DatePosted { get; set; }
+
+        public DateTime DateAdded { get; set; }
+
+
     }
 
     #endregion

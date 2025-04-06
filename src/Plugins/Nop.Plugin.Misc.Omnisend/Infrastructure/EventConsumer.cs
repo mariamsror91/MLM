@@ -2,10 +2,13 @@
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
 using Nop.Plugin.Misc.Omnisend.Services;
 using Nop.Services.Common;
+using Nop.Services.Customers;
 using Nop.Services.Events;
+using Nop.Services.Vendors;
 using Nop.Web.Framework.Events;
 
 namespace Nop.Plugin.Misc.Omnisend.Infrastructure;
@@ -39,6 +42,9 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     private readonly OmnisendEventsService _omnisendEventsService;
     private readonly OmnisendService _omnisendService;
     private readonly OmnisendSettings _settings;
+    private readonly IVendorService _vendorService;
+    private readonly ICustomerService _customerService;
+    private readonly VendorSettings _vendorSettings;
 
     #endregion
 
@@ -47,12 +53,19 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     public EventConsumer(IGenericAttributeService genericAttributeService,
         OmnisendEventsService omnisendEventsService,
         OmnisendService omnisendService,
-        OmnisendSettings settings)
+        OmnisendSettings settings,
+         IVendorService vendorService,          // New
+    ICustomerService customerService,      // New
+    VendorSettings vendorSettings)         // New
     {
         _genericAttributeService = genericAttributeService;
         _omnisendEventsService = omnisendEventsService;
         _omnisendService = omnisendService;
         _settings = settings;
+        // New vendor-related dependencies
+        _vendorService = vendorService;
+        _customerService = customerService;
+        _vendorSettings = vendorSettings;
     }
 
     #endregion
@@ -83,6 +96,33 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     public async Task HandleEventAsync(CustomerRegisteredEvent eventMessage)
     {
         await _omnisendService.UpdateContactAsync(eventMessage.Customer);
+        // New vendor registration logic
+        var customer = eventMessage.Customer;
+
+        // Check if customer is already a vendor
+        if (customer.VendorId > 0)
+            return;
+
+        // Create new vendor
+        var vendor = new Vendor
+        {
+            Name = $"{customer.FirstName} {customer.LastName}",
+            Email = customer.Email,
+            Active =true,
+            AllowCustomersToSelectPageSize = true,
+            PageSize = 15,
+            CreatedOnUtc = customer.CreatedOnUtc,
+            AddressId = customer.BillingAddressId ?? customer.ShippingAddressId ?? 0,
+            Phone = customer.Phone,
+
+        };
+
+        // Save vendor
+        await _vendorService.InsertVendorAsync(vendor);
+
+        // Link customer to vendor
+        customer.VendorId = vendor.Id;
+        await _customerService.UpdateCustomerAsync(customer);
     }
 
     /// <summary>

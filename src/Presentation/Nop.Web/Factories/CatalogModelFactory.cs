@@ -28,6 +28,7 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Media;
+using Nop.Web.Models.Vendors;
 
 namespace Nop.Web.Factories;
 
@@ -66,6 +67,12 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     protected readonly MediaSettings _mediaSettings;
     protected readonly SeoSettings _seoSettings;
     protected readonly VendorSettings _vendorSettings;
+    protected readonly IVendorReviewService _vendorReviews;
+    protected readonly ICustomerModelFactory _customerModelFactory;
+    protected readonly ITagService _tagService;
+
+
+
     private static readonly char[] _separator = [',', ' '];
 
     #endregion
@@ -102,7 +109,10 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         IWorkContext workContext,
         MediaSettings mediaSettings,
         SeoSettings seoSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings,
+        IVendorReviewService vendorReviews,
+        ICustomerModelFactory customerModelFactory,
+        ITagService tagService)
     {
         _blogSettings = blogSettings;
         _catalogSettings = catalogSettings;
@@ -135,6 +145,9 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         _mediaSettings = mediaSettings;
         _seoSettings = seoSettings;
         _vendorSettings = vendorSettings;
+        _vendorReviews = vendorReviews;
+        _customerModelFactory = customerModelFactory;
+        _tagService = tagService;
     }
 
     #endregion
@@ -1180,7 +1193,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// A task that represents the asynchronous operation
     /// The task result contains the vendor model
     /// </returns>
-    public virtual async Task<VendorModel> PrepareVendorModelAsync(Vendor vendor, CatalogProductsCommand command)
+    public virtual async Task<Models.Catalog.VendorModel> PrepareVendorModelAsync(Vendor vendor, CatalogProductsCommand command)
     {
         ArgumentNullException.ThrowIfNull(vendor);
 
@@ -1196,9 +1209,65 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             MetaTitle = await _localizationService.GetLocalizedAsync(vendor, x => x.MetaTitle),
             SeName = await _urlRecordService.GetSeNameAsync(vendor),
             AllowCustomersToContactVendors = _vendorSettings.AllowCustomersToContactVendors,
-            CatalogProductsModel = await PrepareVendorProductsModelAsync(vendor, command)
+            CatalogProductsModel = await PrepareVendorProductsModelAsync(vendor, command),
+            WhatsappLink = vendor.WhatsappLink,
+            Phone = vendor.Phone,
+            CreatedOnUtc = vendor.CreatedOnUtc,
+            AvgReply = vendor.AvgReply,
+            AvgReplyRate = vendor.AvgReplyRate,
         };
 
+        var reviews = await _vendorReviews.GetVendorReviewsByVendorIdAsync(vendor.Id, true);
+        model.ApprovedRatingSum = reviews.Count > 0 ? reviews.Sum(x => x.Rating) / reviews.Count : 0;
+        model.ApprovedTotalReviews = reviews.Count;
+        foreach (var rev in reviews)
+        {
+            var customer = await _customerService.GetCustomerByIdAsync(rev.CustomerId);
+            var customerAvatar = await _customerModelFactory.PrepareCustomerAvatarModelAsync(customer.Id);
+            var tags = await _tagService.GetTagsForReviewAsync(rev.Id);
+            model.VendorReviews.Add(new VendorReviewModel
+            {
+                Rating = rev.Rating,
+                Title = rev.Title,
+                ReviewText = rev.ReviewText,
+                CreatedOnUtc = rev.CreatedOnUtc,
+                CustomerName = customer.FirstName + " " + customer.LastName,
+                CustomerPicture = customerAvatar.AvatarUrl,
+                Tags = tags.Select(x => x.Tag).ToList()
+            });
+        };
+        var topVendorTags = await _tagService.GetTopTagsForVendorAsync(vendor.Id, 3);
+        foreach (var item in topVendorTags)
+        {
+            model.VendorTopTags.Add(new VendorTopTag
+            {
+                Tag = item.Tag,
+                Count = item.Id
+            });
+        }
+
+        var pictureSize = _mediaSettings.AvatarPictureSize;
+
+        var pictureCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.VendorPictureModelKey,
+               vendor, pictureSize, true, await _workContext.GetWorkingLanguageAsync(), _webHelper.IsCurrentConnectionSecured(), await _storeContext.GetCurrentStoreAsync());
+        model.PictureModel = await _staticCacheManager.GetAsync(pictureCacheKey, async () =>
+        {
+            var picture = await _pictureService.GetPictureByIdAsync(vendor.PictureId);
+            string fullSizeImageUrl, imageUrl;
+
+            (fullSizeImageUrl, picture) = await _pictureService.GetPictureUrlAsync(picture);
+            (imageUrl, _) = await _pictureService.GetPictureUrlAsync(picture, pictureSize);
+
+            var pictureModel = new PictureModel
+            {
+                FullSizeImageUrl = fullSizeImageUrl,
+                ImageUrl = imageUrl,
+                Title = string.Format(await _localizationService.GetResourceAsync("Media.Vendor.ImageLinkTitleFormat"), model.Name),
+                AlternateText = string.Format(await _localizationService.GetResourceAsync("Media.Vendor.ImageAlternateTextFormat"), model.Name)
+            };
+
+            return pictureModel;
+        });
         return model;
     }
 
@@ -1293,7 +1362,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// A task that represents the asynchronous operation
     /// The task result contains the list of vendor models
     /// </returns>
-    public virtual async Task<List<VendorModel>> PrepareVendorAllModelsAsync()
+    public virtual async Task<List<Models.Catalog.VendorModel>> PrepareVendorAllModelsAsync()
     {
         var model = new List<VendorModel>();
         var vendors = await _vendorService.GetAllVendorsAsync();
@@ -1333,7 +1402,6 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
                 return pictureModel;
             });
-
             model.Add(vendorModel);
         }
 

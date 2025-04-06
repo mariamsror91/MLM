@@ -236,6 +236,8 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IWidgetModelFactory, WidgetModelFactory>();
         services.AddScoped<IWalletService, WalletService>();
         services.AddScoped<IVendorReviewService, VendorReviewService>();
+        services.AddScoped<ITagService, TagService>();
+
         //attribute services
         services.AddScoped(typeof(IAttributeService<,>), typeof(AttributeService<,>));
 

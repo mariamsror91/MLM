@@ -200,7 +200,7 @@
 	color: #222;
 }
 .product-list .item-box button:before {
-	content: "+";
+	/*content: "+";*/
 	display: inline;
 	position: relative;
 	top: 2px;

@@ -252,6 +252,9 @@ public partial class VendorModelFactory : IVendorModelFactory
 
         model.ApprovedRatingSum = reviews.Count > 0 ? reviews.Sum(x => x.Rating)/ reviews.Count :0;
         model.ApprovedTotalReviews = reviews.Count;
+        model.VendorProductsCount = await _vendorService.GetVendorProductsCount(vendor.Id);
+
+
         return model;
     }
 

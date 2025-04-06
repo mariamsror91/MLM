@@ -127,6 +127,8 @@ public partial interface ICustomerModelFactory
     /// </returns>
     Task<CustomerAvatarModel> PrepareCustomerAvatarModelAsync(CustomerAvatarModel model);
 
+    Task<CustomerAvatarModel> PrepareCustomerAvatarModelAsync(int customerId);
+
     /// <summary>
     /// Prepare the GDPR tools model
     /// </summary>

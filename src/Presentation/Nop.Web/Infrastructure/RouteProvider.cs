@@ -77,11 +77,11 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
 
         //customer account links
         endpointRouteBuilder.MapControllerRoute(name: "CustomerInfo",
-            pattern: $"{lang}/customer/info",
+            pattern: $"{lang}/customer-info",
             defaults: new { controller = "Customer", action = "Info" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerAddresses",
-            pattern: $"{lang}/customer/addresses",
+            pattern: $"{lang}/customer-addresses",
             defaults: new { controller = "Customer", action = "Addresses" });
 
         //customer address delete (AJAX)
@@ -95,7 +95,7 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
             defaults: new { controller = "Customer", action = "RemoveExternalAssociation" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerOrders",
-            pattern: $"{lang}/order/history",
+            pattern: $"{lang}/order-history",
             defaults: new { controller = "Order", action = "CustomerOrders" });
 
         //contact us
@@ -293,7 +293,7 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
 
         //register result page
         endpointRouteBuilder.MapControllerRoute(name: "RegisterResult",
-            pattern: $"{lang}/registerresult/{{resultId:min(0)}}",
+            pattern: $"{lang}/registerresult",
             defaults: new { controller = "Customer", action = "RegisterResult" });
 
         //check username availability (AJAX)
@@ -366,11 +366,11 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
             defaults: new { controller = "Order", action = "CustomerWallet" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerChangePassword",
-            pattern: $"{lang}/customer/changepassword",
+            pattern: $"{lang}/customer-changepassword",
             defaults: new { controller = "Customer", action = "ChangePassword" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerAvatar",
-            pattern: $"{lang}/customer/avatar",
+            pattern: $"{lang}/customer-avatar",
             defaults: new { controller = "Customer", action = "Avatar" });
 
         endpointRouteBuilder.MapControllerRoute(name: "AccountActivation",
@@ -386,11 +386,11 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
             defaults: new { controller = "Boards", action = "CustomerForumSubscriptions" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerAddressEdit",
-            pattern: $"{lang}/customer/addressedit/{{addressId:min(0)}}",
+            pattern: $"{lang}/customer-addressedit",
             defaults: new { controller = "Customer", action = "AddressEdit" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerAddressAdd",
-            pattern: $"{lang}/customer/addressadd",
+            pattern: $"{lang}/customer-addressadd",
             defaults: new { controller = "Customer", action = "AddressAdd" });
 
         endpointRouteBuilder.MapControllerRoute(name: "CustomerMultiFactorAuthenticationProviderConfig",

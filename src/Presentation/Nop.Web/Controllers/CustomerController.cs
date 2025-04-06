@@ -34,6 +34,7 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Tax;
+using Nop.Services.Vendors;
 using Nop.Web.Factories;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
@@ -89,6 +90,7 @@ public partial class CustomerController : BasePublicController
     protected readonly IStoreContext _storeContext;
     protected readonly ITaxService _taxService;
     protected readonly IWorkContext _workContext;
+    protected readonly IVendorService _vendorService;
     protected readonly IWorkflowMessageService _workflowMessageService;
     protected readonly LocalizationSettings _localizationSettings;
     protected readonly MediaSettings _mediaSettings;
@@ -1023,10 +1025,10 @@ public partial class CustomerController : BasePublicController
                         await _workflowMessageService.SendCustomerEmailValidationMessageAsync(customer, currentLanguage.Id);
 
                         //result
-                        return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.EmailValidation, returnUrl });
+                       return Redirect(Url.RouteUrl("RegisterResult", new { resultId = ((int)UserRegistrationType.EmailValidation).ToString(), returnUrl }));
 
                     case UserRegistrationType.AdminApproval:
-                        return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.AdminApproval, returnUrl });
+                        return RedirectToAction("RegisterResult", new { resultId = ((int)UserRegistrationType.AdminApproval).ToString(), returnUrl });
 
                     case UserRegistrationType.Standard:
                         //send customer welcome message
@@ -1035,7 +1037,7 @@ public partial class CustomerController : BasePublicController
                         //raise event       
                         await _eventPublisher.PublishAsync(new CustomerActivatedEvent(customer));
 
-                        returnUrl = Url.RouteUrl("RegisterResult", new { resultId = (int)UserRegistrationType.Standard, returnUrl });
+                        returnUrl = Url.RouteUrl("RegisterResult", new { resultId = ((int)UserRegistrationType.Standard).ToString(), returnUrl });
                         return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, true);
 
                     default:
@@ -1056,12 +1058,12 @@ public partial class CustomerController : BasePublicController
 
     //available even when navigation is not allowed
     [CheckAccessPublicStore(ignore: true)]
-    public virtual async Task<IActionResult> RegisterResult(int resultId, string returnUrl)
+    public virtual async Task<IActionResult> RegisterResult(string resultId, string returnUrl)
     {
         if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl("Homepage");
-
-        var model = await _customerModelFactory.PrepareRegisterResultModelAsync(resultId, returnUrl);
+        var parsed = int.Parse(resultId);
+        var model = await _customerModelFactory.PrepareRegisterResultModelAsync(parsed, returnUrl);
         return View(model);
     }
 
@@ -1731,7 +1733,17 @@ public partial class CustomerController : BasePublicController
                 if (customerAvatar != null)
                     customerAvatarId = customerAvatar.Id;
 
-                await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.AvatarPictureIdAttribute, customerAvatarId);
+                if (customer.VendorId > 0)
+                {
+                    var vendor = await _vendorService.GetVendorByIdAsync(customer.VendorId);
+                    if (vendor != null)
+                    {
+                        vendor.PictureId = customerAvatarId;
+                        await _vendorService.UpdateVendorAsync(vendor);
+                    }
+                }
+
+                    await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.AvatarPictureIdAttribute, customerAvatarId);
 
                 model.AvatarUrl = await _pictureService.GetPictureUrlAsync(
                     await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.AvatarPictureIdAttribute),

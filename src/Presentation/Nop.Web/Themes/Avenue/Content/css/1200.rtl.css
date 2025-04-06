@@ -38,8 +38,8 @@
   .registration-page, .login-page, .password-recovery-page {
     margin-top: -200px;
   }
-    .registration-page .page-title, .login-page .page-title, .password-recovery-page .page-title {
-      background: none !important;
+    .registration-page .page-title, .login-page .page-title, .password-recovery-page .page-title, .registration-result-page .page-title {
+      background: none;
       position: relative;
       height: 100px;
     }
