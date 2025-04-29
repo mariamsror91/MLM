@@ -147,6 +147,8 @@ public partial record RegisterModel : BaseNopModel
     public bool HoneypotEnabled { get; set; }
     public bool DisplayCaptcha { get; set; }
 
+
+
     public IList<CustomerAttributeModel> CustomerAttributes { get; set; }
 
     public IList<GdprConsentModel> GdprConsents { get; set; }

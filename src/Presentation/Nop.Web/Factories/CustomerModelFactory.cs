@@ -755,6 +755,14 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             ItemClass = "customer-wishlist"
         });
 
+        model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+        {
+            RouteName = "Subscriptions",
+            Title = await _localizationService.GetResourceAsync("Account.MySubscriptions"),
+            Tab = (int)CustomerNavigationEnum.Subscriptions,
+            ItemClass = "customer-subscriptions"
+        });
+
         model.SelectedTab = selectedTabId;
 
         return model;

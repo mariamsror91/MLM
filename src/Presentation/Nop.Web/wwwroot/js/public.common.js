@@ -135,11 +135,20 @@ function displayBarNotification(message, messagetype, timeout) {
     //add close button for notification
     var close = document.createElement('span');
     close.classList.add('close');
-    close.setAttribute('title', document.getElementById('bar-notification').dataset.close);
+  close.setAttribute('title', document.getElementById('bar-notification').dataset.close);
 
-    for (var i = 0; i < messages.length; i++) {
+  htmlcode.appendChild(
+    Object.assign(document.createElement('img'), {
+      className: 'popup-check',
+      src: 'images/check.png'
+    })
+  );
+
+  for (var i = 0; i < messages.length; i++) {
+
         var content = document.createElement('p');
-        content.classList.add('content');
+    content.classList.add('content');
+
         content.innerHTML = messages[i];
 
       htmlcode.appendChild(content);

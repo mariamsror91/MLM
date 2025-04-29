@@ -41,5 +41,7 @@ public enum CustomerNavigationEnum
     MultiFactorAuthentication = 140,
     Wallet = 150,
     WishList = 160,
+    Subscriptions = 170,
+
 
 }

@@ -2614,7 +2614,7 @@ order-details-page .cart, .data-table,
   }
 
   .add-to-wishlist-button:before {
-    content: "\e08a";
+    /*content: "\e08a";*/
   }
 
   .product-box-add-to-cart-button:before {

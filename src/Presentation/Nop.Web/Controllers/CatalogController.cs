@@ -80,7 +80,8 @@ public partial class CatalogController : BasePublicController
         IWorkContext workContext,
         MediaSettings mediaSettings,
         VendorSettings vendorSettings,
-        ITagService tagService)
+        ITagService tagService,
+        IVendorReviewService vendorReviewService)
     {
         _catalogSettings = catalogSettings;
         _aclService = aclService;
@@ -104,6 +105,7 @@ public partial class CatalogController : BasePublicController
         _mediaSettings = mediaSettings;
         _vendorSettings = vendorSettings;
         _tagService = tagService;
+        _vendorReviewService = vendorReviewService;
     }
 
     #endregion
@@ -315,13 +317,15 @@ public partial class CatalogController : BasePublicController
         }
 
         // Save review and tags (use your existing review service)
+        var customerId = (await _workContext.GetCurrentCustomerAsync()).Id;
+    
       var id =  await _vendorReviewService.InsertVendorReviewAsync(new VendorReview() {
             CreatedOnUtc = DateTime.UtcNow,
             VendorId = model.VendorId,
-           CustomerId = (await _workContext.GetCurrentCustomerAsync()).Id,
+           CustomerId = customerId,
            Rating = model.Rating,
            ReviewText = model.ReviewText,
-           Title = model.Title,
+           Title = model.Title??"",
            IsApproved = true
        });
 

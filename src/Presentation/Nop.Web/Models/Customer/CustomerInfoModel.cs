@@ -144,6 +144,17 @@ public partial record CustomerInfoModel : BaseNopModel
 
     public IList<GdprConsentModel> GdprConsents { get; set; }
 
+
+    [DataType(DataType.Url)]
+    [NopResourceDisplayName("Account.Fields.WhatsappLink")]
+    public string WhatsappLink { get; set; }
+
+
+
+    public bool HideVisits { get; set; }
+    public bool ContactMe { get; set; }
+    public bool SendEmails { get; set; }
+
     #region Nested classes
 
     public partial record AssociatedExternalAuthModel : BaseNopEntityModel

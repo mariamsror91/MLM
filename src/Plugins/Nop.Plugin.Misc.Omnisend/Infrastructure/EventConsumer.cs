@@ -114,7 +114,7 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
             CreatedOnUtc = customer.CreatedOnUtc,
             AddressId = customer.BillingAddressId ?? customer.ShippingAddressId ?? 0,
             Phone = customer.Phone,
-
+            
         };
 
         // Save vendor

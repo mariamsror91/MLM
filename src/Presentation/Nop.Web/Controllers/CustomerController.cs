@@ -148,7 +148,8 @@ public partial class CustomerController : BasePublicController
         MediaSettings mediaSettings,
         MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
         StoreInformationSettings storeInformationSettings,
-        TaxSettings taxSettings)
+        TaxSettings taxSettings,
+        IVendorService vendorService)
     {
         _addressSettings = addressSettings;
         _captchaSettings = captchaSettings;
@@ -196,6 +197,7 @@ public partial class CustomerController : BasePublicController
         _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
         _storeInformationSettings = storeInformationSettings;
         _taxSettings = taxSettings;
+        _vendorService = vendorService;
     }
 
     #endregion
@@ -643,7 +645,8 @@ public partial class CustomerController : BasePublicController
                 await _workflowMessageService.SendCustomerPasswordRecoveryMessageAsync(customer,
                     (await _workContext.GetWorkingLanguageAsync()).Id);
 
-                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Account.PasswordRecovery.EmailHasBeenSent"));
+                return RedirectToAction("PasswordRecoveryConfirm",new {token = passwordRecoveryToken.ToString(), email = customer.Email, guid = passwordRecoveryToken });
+               /// _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Account.PasswordRecovery.EmailHasBeenSent"));
             }
             else
             {
@@ -709,7 +712,7 @@ public partial class CustomerController : BasePublicController
                        ?? await _customerService.GetCustomerByGuidAsync(guid);
 
         if (customer == null)
-            return RedirectToRoute("Homepage");
+            return RedirectToRoute("Login");
 
         model.ReturnUrl = Url.RouteUrl("Homepage");
 
@@ -881,7 +884,6 @@ public partial class CustomerController : BasePublicController
                     customer.Phone = model.Phone;
                 if (_customerSettings.FaxEnabled)
                     customer.Fax = model.Fax;
-
                 //save customer attributes
                 customer.CustomCustomerAttributesXML = customerAttributesXml;
                 await _customerService.UpdateCustomerAsync(customer);
@@ -1283,9 +1285,19 @@ public partial class CustomerController : BasePublicController
                     customer.Phone = model.Phone;
                 if (_customerSettings.FaxEnabled)
                     customer.Fax = model.Fax;
+                customer.SendEmails = model.SendEmails;
+                customer.HideVisits = model.HideVisits;
+                customer.ContactMe  = model.ContactMe;
 
                 customer.CustomCustomerAttributesXML = customerAttributesXml;
                 await _customerService.UpdateCustomerAsync(customer);
+
+                var vendor = await _vendorService.GetVendorByIdAsync(customer.VendorId);  
+                if (vendor != null)
+                {
+                    vendor.Phone = customer.Phone;
+                    vendor.WhatsappLink = model.WhatsappLink;
+                }
 
                 //newsletter
                 if (_customerSettings.NewsletterEnabled)

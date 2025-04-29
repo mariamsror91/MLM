@@ -566,8 +566,11 @@ public partial class ShoppingCartController : BasePublicController
         var productAttributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
         if (productAttributes.Any(pam => pam.AttributeControlType != AttributeControlType.ReadonlyCheckboxes))
         {
-            //product has some attributes. let a customer see them
-            return Json(new { redirect = redirectUrl });
+            if (cartType == ShoppingCartType.ShoppingCart)
+            {
+                //product has some attributes. let a customer see them
+                return Json(new { redirect = redirectUrl });
+            }
         }
 
         //creating XML for "read-only checkboxes" attributes
@@ -593,43 +596,51 @@ public partial class ShoppingCartController : BasePublicController
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, cartType, store.Id);
         var shoppingCartItem = await _shoppingCartService.FindShoppingCartItemInTheCartAsync(cart, cartType, product);
         //if we already have the same product in the cart, then use the total quantity to validate
-        var quantityToValidate = shoppingCartItem != null ? shoppingCartItem.Quantity + quantity : quantity;
-        var addToCartWarnings = await _shoppingCartService
-            .GetShoppingCartItemWarningsAsync(customer, cartType,
-                product, store.Id, string.Empty,
-                decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
-        if (addToCartWarnings.Any())
+        if (cartType == ShoppingCartType.ShoppingCart)
         {
-            //cannot be added to the cart
-            //let's display standard warnings
-            return Json(new
+            var quantityToValidate = shoppingCartItem != null ? shoppingCartItem.Quantity + quantity : quantity;
+            var addToCartWarnings = await _shoppingCartService
+                .GetShoppingCartItemWarningsAsync(customer, cartType,
+                    product, store.Id, string.Empty,
+                    decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
+            if (addToCartWarnings.Any())
             {
-                success = false,
-                message = addToCartWarnings.ToArray()
-            });
-        }
+                //cannot be added to the cart
+                //let's display standard warnings
+                return Json(new
+                {
+                    success = false,
+                    message = addToCartWarnings.ToArray()
+                });
+            }
 
-        //now let's try adding product to the cart (now including product attribute validation, etc)
-        addToCartWarnings = await _shoppingCartService.AddToCartAsync(customer: customer,
-            product: product,
-            shoppingCartType: cartType,
-            storeId: store.Id,
-            attributesXml: attXml,
-            quantity: quantity);
-        if (addToCartWarnings.Any())
-        {
-            //cannot be added to the cart
-            //but we do not display attribute and gift card warnings here. let's do it on the product details page
-            return Json(new { redirect = redirectUrl });
+            //now let's try adding product to the cart (now including product attribute validation, etc)
+            addToCartWarnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+                product: product,
+                shoppingCartType: cartType,
+                storeId: store.Id,
+                attributesXml: attXml,
+                quantity: quantity);
+            if (addToCartWarnings.Any())
+            {
+                //cannot be added to the cart
+                //but we do not display attribute and gift card warnings here. let's do it on the product details page
+                return Json(new { redirect = redirectUrl });
+            }
         }
-
         //added to the cart/wishlist
         switch (cartType)
         {
             case ShoppingCartType.Wishlist:
             {
-                //activity log
-                await _customerActivityService.InsertActivityAsync("PublicStore.AddToWishlist",
+                    //activity log
+                  var warns =  await _shoppingCartService.AddToCartAsync(customer: customer,
+                    product: product,
+                    shoppingCartType: cartType,
+                    storeId: store.Id,
+                    attributesXml: attXml,
+                    quantity: quantity);
+                    await _customerActivityService.InsertActivityAsync("PublicStore.AddToWishlist",
                     string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToWishlist"), product.Name), product);
 
                 if (_shoppingCartSettings.DisplayWishlistAfterAddingProduct || forceredirection)
@@ -694,6 +705,7 @@ public partial class ShoppingCartController : BasePublicController
     //add product to cart using AJAX
     //currently we use this method on the product details pages
     [HttpPost]
+    [HttpPost]
     public virtual async Task<IActionResult> AddProductToCart_Details(int productId, int shoppingCartTypeId, IFormCollection form)
     {
         var product = await _productService.GetProductByIdAsync(productId);
@@ -723,7 +735,6 @@ public partial class ShoppingCartController : BasePublicController
                 _ = int.TryParse(form[formKey], out updatecartitemid);
                 break;
             }
-
 
         ShoppingCartItem updatecartitem = null;
         if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
@@ -761,15 +772,51 @@ public partial class ShoppingCartController : BasePublicController
         //entered quantity
         var quantity = _productAttributeParser.ParseEnteredQuantity(product, form);
 
-        //product and gift card attributes
-        var attributes = await _productAttributeParser.ParseProductAttributesAsync(product, form, addToCartWarnings);
+        var cartType = updatecartitem == null ? (ShoppingCartType)shoppingCartTypeId :
+            //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
+            updatecartitem.ShoppingCartType;
+
+        // MODIFICATION: Handle attributes differently for wishlist
+        string attributes;
+        if (cartType == ShoppingCartType.Wishlist)
+        {
+            // For wishlist, check if form contains any attribute data
+            bool hasAttributeData = form.Keys.Any(k => k.StartsWith("product_attribute_"));
+
+            if (hasAttributeData)
+            {
+                // If user provided attributes, use them
+                attributes = await _productAttributeParser.ParseProductAttributesAsync(product, form, addToCartWarnings);
+            }
+            else
+            {
+                // For wishlist with no attributes provided, use default/pre-selected values
+                var productAttributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+                attributes = await productAttributes.AggregateAwaitAsync(string.Empty, async (attributesXml, attribute) =>
+                {
+                    var attributeValues = await _productAttributeService.GetProductAttributeValuesAsync(attribute.Id);
+                    foreach (var selectedAttributeId in attributeValues
+                                 .Where(v => v.IsPreSelected)
+                                 .Select(v => v.Id)
+                                 .ToList())
+                    {
+                        attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                            attribute, selectedAttributeId.ToString());
+                    }
+
+                    return attributesXml;
+                });
+            }
+        }
+        else
+        {
+            // For shopping cart, use normal attribute parsing with validation
+            attributes = await _productAttributeParser.ParseProductAttributesAsync(product, form, addToCartWarnings);
+        }
 
         //rental attributes
         _productAttributeParser.ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
 
-        var cartType = updatecartitem == null ? (ShoppingCartType)shoppingCartTypeId :
-            //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
-            updatecartitem.ShoppingCartType;
         var method = form[$"addtocart_{product.Id.ToString()}.SelectedShippingMethod"];
         var selectedShippingMethod = 0;
         await SaveItemAsync(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity, selectedShippingMethod);
@@ -777,6 +824,90 @@ public partial class ShoppingCartController : BasePublicController
         //return result
         return await GetProductToCartDetailsAsync(addToCartWarnings, cartType, product);
     }
+
+    //public virtual async Task<IActionResult> AddProductToCart_Details(int productId, int shoppingCartTypeId, IFormCollection form)
+    //{
+    //    var product = await _productService.GetProductByIdAsync(productId);
+    //    if (product == null)
+    //    {
+    //        return Json(new
+    //        {
+    //            redirect = Url.RouteUrl("Homepage")
+    //        });
+    //    }
+
+    //    //we can add only simple products
+    //    if (product.ProductType != ProductType.SimpleProduct)
+    //    {
+    //        return Json(new
+    //        {
+    //            success = false,
+    //            message = "Only simple products could be added to the cart"
+    //        });
+    //    }
+
+    //    //update existing shopping cart item
+    //    var updatecartitemid = 0;
+    //    foreach (var formKey in form.Keys)
+    //        if (formKey.Equals($"addtocart_{productId}.UpdatedShoppingCartItemId", StringComparison.InvariantCultureIgnoreCase))
+    //        {
+    //            _ = int.TryParse(form[formKey], out updatecartitemid);
+    //            break;
+    //        }
+
+
+    //    ShoppingCartItem updatecartitem = null;
+    //    if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+    //    {
+    //        var store = await _storeContext.GetCurrentStoreAsync();
+    //        //search with the same cart type as specified
+    //        var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), (ShoppingCartType)shoppingCartTypeId, store.Id);
+
+    //        updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
+    //        //not found? let's ignore it. in this case we'll add a new item
+    //        //if (updatecartitem == null)
+    //        //{
+    //        //    return Json(new
+    //        //    {
+    //        //        success = false,
+    //        //        message = "No shopping cart item found to update"
+    //        //    });
+    //        //}
+    //        //is it this product?
+    //        if (updatecartitem != null && product.Id != updatecartitem.ProductId)
+    //        {
+    //            return Json(new
+    //            {
+    //                success = false,
+    //                message = "This product does not match a passed shopping cart item identifier"
+    //            });
+    //        }
+    //    }
+
+    //    var addToCartWarnings = new List<string>();
+
+    //    //customer entered price
+    //    var customerEnteredPriceConverted = await _productAttributeParser.ParseCustomerEnteredPriceAsync(product, form);
+
+    //    //entered quantity
+    //    var quantity = _productAttributeParser.ParseEnteredQuantity(product, form);
+
+    //    //product and gift card attributes
+    //    var attributes = await _productAttributeParser.ParseProductAttributesAsync(product, form, addToCartWarnings);
+
+    //    //rental attributes
+    //    _productAttributeParser.ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
+
+    //    var cartType = updatecartitem == null ? (ShoppingCartType)shoppingCartTypeId :
+    //        //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
+    //        updatecartitem.ShoppingCartType;
+    //    var method = form[$"addtocart_{product.Id.ToString()}.SelectedShippingMethod"];
+    //    var selectedShippingMethod = 0;
+    //    await SaveItemAsync(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity, selectedShippingMethod);
+
+    //    //return result
+    //    return await GetProductToCartDetailsAsync(addToCartWarnings, cartType, product);
+    //}
 
     //handle product attribute selection event. this way we return new price, overridden gtin/sku/mpn
     //currently we use this method on the product details pages

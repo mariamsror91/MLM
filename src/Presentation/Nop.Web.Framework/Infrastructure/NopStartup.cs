@@ -47,6 +47,7 @@ using Nop.Services.Shipping;
 using Nop.Services.Shipping.Date;
 using Nop.Services.Shipping.Pickup;
 using Nop.Services.Stores;
+using Nop.Services.Subscription;
 using Nop.Services.Tax;
 using Nop.Services.Themes;
 using Nop.Services.Topics;
@@ -237,6 +238,8 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IWalletService, WalletService>();
         services.AddScoped<IVendorReviewService, VendorReviewService>();
         services.AddScoped<ITagService, TagService>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
+
 
         //attribute services
         services.AddScoped(typeof(IAttributeService<,>), typeof(AttributeService<,>));

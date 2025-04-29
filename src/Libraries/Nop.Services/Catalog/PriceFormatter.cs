@@ -66,16 +66,18 @@ public partial class PriceFormatter : IPriceFormatter
             result = amount.ToString(targetCurrency.CustomFormatting);
         else
         {
-            if (!string.IsNullOrEmpty(targetCurrency.DisplayLocale))
-                //default behavior
-                result = amount.ToString("C", new CultureInfo(targetCurrency.DisplayLocale));
-            else
-            {
-                //not possible because "DisplayLocale" should be always specified
-                //but anyway let's just handle this behavior
-                result = $"{amount:N} ({targetCurrency.CurrencyCode})";
-                return result;
-            }
+            result = $"{amount:N} ({targetCurrency.CurrencyCode})";
+            //return result;
+            //if (!string.IsNullOrEmpty(targetCurrency.DisplayLocale))
+            //    //default behavior
+            //    result = amount.ToString("C", new CultureInfo(targetCurrency.DisplayLocale));
+            //else
+            //{
+            //    //not possible because "DisplayLocale" should be always specified
+            //    //but anyway let's just handle this behavior
+            //    result = $"{amount:N} ({targetCurrency.CurrencyCode})";
+            //    return result;
+            //}
         }
 
         //display currency code?

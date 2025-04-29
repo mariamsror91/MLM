@@ -92,7 +92,7 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
 
         if (entityDescriptor is null)
             return [];
-
+        var mmmm = NameCompatibilityManager.GetColumnName(type, memberInfo.Name);
         var attribute = Types.GetOrAdd((type, memberInfo), _ =>
         {
 

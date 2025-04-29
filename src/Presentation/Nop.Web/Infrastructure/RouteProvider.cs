@@ -308,7 +308,7 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
 
         //password recovery confirmation
         endpointRouteBuilder.MapControllerRoute(name: "PasswordRecoveryConfirm",
-            pattern: $"{lang}/passwordrecovery/confirm",
+            pattern: $"{lang}/passwordrecoveryConfirm",
             defaults: new { controller = "Customer", action = "PasswordRecoveryConfirm" });
 
         //topics (AJAX)
@@ -737,7 +737,38 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: "InstallationRestartApplication",
             pattern: $"{NopInstallationDefaults.InstallPath}/restartapplication",
             defaults: new { controller = "Install", action = "RestartApplication" });
+        
+        // subscriptions    
+        endpointRouteBuilder.MapControllerRoute(name: "SelectPlan",
+            pattern: $"{lang}/SelectPlan",
+            defaults: new { controller = "Subscription", action = "SelectPlan" });
 
+        endpointRouteBuilder.MapControllerRoute(name: "MySubscriptions",
+           pattern: $"{lang}/MySubscriptions",
+           defaults: new { controller = "Subscription", action = "CustomerSubscriptions" });
+
+        endpointRouteBuilder.MapControllerRoute(name: "CheckoutComplete",
+          pattern: $"{lang}/CheckoutComplete",
+          defaults: new { controller = "Subscription", action = "CheckoutComplete" });
+
+
+        endpointRouteBuilder.MapControllerRoute(name: "SubscriptionCheckout",
+           pattern: $"{lang}/SubscriptionCheckout",
+           defaults: new { controller = "Subscription", action = "Checkout" });
+
+        endpointRouteBuilder.MapControllerRoute(name: "SelectAdCategory",
+        pattern: $"{lang}/SelectAdCategory",
+        defaults: new { controller = "PostAd", action = "SelectCategory" });
+
+        endpointRouteBuilder.MapControllerRoute(name: "PostAd",
+        pattern: $"{lang}/PostAd",
+        defaults: new { controller = "PostAd", action = "PostNewAd" });
+       
+        
+        endpointRouteBuilder.MapControllerRoute(name: "Subscriptions",
+         pattern: $"{lang}/Subscriptions",
+         defaults: new { controller = "Subscription", action = "AllSubscriptions" });
+        
         //page not found
         endpointRouteBuilder.MapControllerRoute(name: "PageNotFound",
             pattern: $"{lang}/page-not-found",

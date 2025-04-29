@@ -240,6 +240,9 @@ public partial class Customer : BaseEntity, ISoftDeletedEntity
 
     public decimal WalletBalance { get; set; } // Virtual field calculated from transactions
 
+    public bool HideVisits { get; set; }
+    public bool ContactMe { get; set; }
+    public bool SendEmails { get; set; }
 
     #region Custom properties
 
